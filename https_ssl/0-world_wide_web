@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
-# Displays the A record information for a domain's subdomains, using dig and awk
+# Displays the A record information for a domain's subdomains using dig and awk
+# shellcheck disable=SC2086
 
 domain="$1"
 subdomain="$2"
 
-print_subdomain_info() {
+get_subdomain_info() {
     local sub="$1"
     local record
-    
-    # Extract non-comment line directly under ANSWER SECTION using awk
-    record=$(dig "${sub}.${domain}" | awk '/^;; ANSWER SECTION:/ {flag=1; next} /^;;/ {flag=0} flag && NF {print $4, $5; exit}')
-    
-    local type
-    type=$(echo "$record" | awk '{print $1}')
+    record=$(dig $sub.$domain | awk '/^;; ANSWER SECTION:/{getline; print $4, $5}')
+    local rec_type
+    rec_type=$(echo "$record" | awk '{print $1}')
     local destination
     destination=$(echo "$record" | awk '{print $2}')
     
-    echo "The subdomain $sub is a $type record and points to $destination"
+    echo "The subdomain $sub is a $rec_type record and points to $destination"
 }
 
 if [ -n "$subdomain" ]; then
-    print_subdomain_info "$subdomain"
+    get_subdomain_info "$subdomain"
 else
     for sub in www lb-01 web-01 web-02; do
-        print_subdomain_info "$sub"
+        get_subdomain_info "$sub"
     done
 fi
