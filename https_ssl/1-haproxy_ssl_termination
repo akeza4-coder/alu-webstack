@@ -8,8 +8,9 @@ global
 
     ca-base /etc/ssl/certs
     crt-base /etc/ssl/private
+    tune.ssl.default-dh-param 2048
 
-    ssl-default-bind-ciphers PROFILE=SYSTEM
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
     ssl-default-bind-options no-sslv3
 
 defaults
@@ -24,7 +25,7 @@ defaults
 frontend http_frontend
     bind *:80
     bind *:443 ssl crt /etc/haproxy/certs/thedana.tech.pem
-    
+
     option forwardfor
     http-request set-header X-Forwarded-Proto https if { ssl_fc }
 
